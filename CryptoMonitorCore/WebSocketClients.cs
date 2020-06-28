@@ -53,7 +53,7 @@ namespace CryptoMonitorCore
             List<List<string>> bids = new List<List<string>>();
             gateioClient.ReconnectTimeout = TimeSpan.FromSeconds(30);
             gateioClient.ReconnectionHappened.Subscribe(info =>
-                Console.WriteLine($"Reconnection happened, type: {info.Type}"));
+                Console.WriteLine($"Gate.io Reconnection happened, type: {info.Type}"));
             gateioClient
                 .MessageReceived
                 .ObserveOn(TaskPoolScheduler.Default)
@@ -62,7 +62,7 @@ namespace CryptoMonitorCore
                     asks.Clear();
                     bids.Clear();
                     string jsonString = msg.ToString();
-                    LogWriters.WriteResponce("gate.io", jsonString);
+                    //LogWriters.WriteResponce("gate.io", jsonString);
 
                     JObject jsonObj = JObject.Parse(jsonString);
                     if (jsonObj.ContainsKey("result"))
@@ -73,8 +73,7 @@ namespace CryptoMonitorCore
                         }
                     }
                     else if (jsonObj.ContainsKey("params"))
-                    {
-                        //if (Convert.ToBoolean(gateioJsonObj["params"][0].ToString()) == true)                        
+                    {                      
                         string processingSym = jsonObj["params"][2].ToString();
                         processingSym = processingSym.Remove(processingSym.Length - 5);
                         foreach (Symbol symObj in symbols)
@@ -151,7 +150,7 @@ namespace CryptoMonitorCore
             List<List<string>> bids = new List<List<string>>();
             okexClient.ReconnectTimeout = TimeSpan.FromSeconds(30);
             okexClient.ReconnectionHappened.Subscribe(info =>
-                Console.WriteLine($"Reconnection happened, type: {info.Type}"));
+                Console.WriteLine($"Okex Reconnection happened, type: {info.Type}"));
             okexClient
                 .MessageReceived
                 .ObserveOn(TaskPoolScheduler.Default)
@@ -161,7 +160,7 @@ namespace CryptoMonitorCore
                     bids.Clear();
                     byte[] bytes = msg.Binary;
                     string jsonString = DecompressOkex(bytes);
-                    LogWriters.WriteResponce("Okex", jsonString);
+                    //LogWriters.WriteResponce("Okex", jsonString);
 
                     JObject jsonObj = JObject.Parse(jsonString);
 
@@ -250,7 +249,7 @@ namespace CryptoMonitorCore
             List<List<string>> bids = new List<List<string>>();
             huobiClient.ReconnectTimeout = TimeSpan.FromSeconds(30);
             huobiClient.ReconnectionHappened.Subscribe(info =>
-                Console.WriteLine($"Reconnection happened, type: {info.Type}"));
+                Console.WriteLine($"Huobi Reconnection happened, type: {info.Type}"));
             huobiClient
                 .MessageReceived
                 .ObserveOn(TaskPoolScheduler.Default)
@@ -260,7 +259,7 @@ namespace CryptoMonitorCore
                     bids.Clear();
                     byte[] bytes = msg.Binary;
                     string jsonString = Encoding.UTF8.GetString(DecompressHuobi(bytes));
-                    LogWriters.WriteResponce("Huobi", jsonString);
+                    //LogWriters.WriteResponce("Huobi", jsonString);
 
                     JObject jsonObj = JObject.Parse(jsonString);
 
@@ -319,13 +318,33 @@ namespace CryptoMonitorCore
                         foreach (var valVol in asks)
                         {
                             decimal value = Convert.ToDecimal(valVol[0], CultureInfo.InvariantCulture);
-                            decimal volume = Convert.ToDecimal(valVol[1], CultureInfo.InvariantCulture);
+                            decimal volume;
+                            try
+                            {
+                                volume = Convert.ToDecimal(valVol[1], CultureInfo.InvariantCulture);
+                            }
+                            catch
+                            {
+                                //Console.WriteLine($"Exception with {valVol[1]}");
+                                volume = decimal.Parse(valVol[1], NumberStyles.Float, CultureInfo.InvariantCulture);
+                                //Console.WriteLine($"{valVol[1]} {volume}");
+                            }
                             processingSymObj.AddAskEl(value, volume);
                         }
                         foreach (var valVol in bids)
                         {
                             decimal value = Convert.ToDecimal(valVol[0], CultureInfo.InvariantCulture);
-                            decimal volume = Convert.ToDecimal(valVol[1], CultureInfo.InvariantCulture);
+                            decimal volume;
+                            try
+                            {
+                                volume = Convert.ToDecimal(valVol[1], CultureInfo.InvariantCulture);
+                            }
+                            catch
+                            {
+                                //Console.WriteLine($"Exception with {valVol[1]}");
+                                volume = decimal.Parse(valVol[1], NumberStyles.Float, CultureInfo.InvariantCulture);
+                                //Console.WriteLine($"{valVol[1]} {volume}");
+                            }
                             processingSymObj.AddBidEl(value * -1, volume);
                         }
 
