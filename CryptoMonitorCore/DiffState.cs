@@ -30,87 +30,15 @@ namespace CryptoMonitorCore
             this.minStepValue = minStepValue;
         }
 
-        //public void WriteMarketDiffState()
-        //{
-        //    if (objA.Ask != 0 && objA.Bid != 0 && objB.Ask != 0 && objB.Bid != 0)
-        //    {
-        //        string message = $"{DateTime.Now} ";
-        //        if (objA.Ask < objB.Bid)
-        //        {
-        //            decimal AB = ((objB.Bid - objA.Ask) / objA.Ask) * 100;
-        //            if (AB >= minDiffValue && (Math.Abs(AB - lastDiffAB) >= minStepValue))
-        //            {
-        //                message += $"{objA.SymbolName} diff {objA.ExchangeName} –> {objB.ExchangeName} = {AB}";
-        //                message += "\n-----------------------------\n";
-        //                File.AppendAllText("Profit.log", message);
-        //                wasProfitableAB = true;
-        //                lastDiffAB = AB;
-        //            }
-        //            else if (AB < minDiffValue)
-        //            {
-        //                noLongerProfitableAB();
-        //            }
-        //        }
-        //        else if (objB.Ask < objA.Bid)
-        //        {
-        //            decimal BA = ((objA.Bid - objB.Ask) / objB.Ask) * 100;
-        //            if (BA >= minDiffValue && (Math.Abs(BA - lastDiffBA) >= minStepValue))
-        //            {
-        //                message += $"{objA.SymbolName} diff {objB.ExchangeName} –> {objA.ExchangeName} = {BA}";
-        //                message += "\n-----------------------------\n";
-        //                File.AppendAllText("Profit.log", message);
-        //                wasProfitableBA = true;
-        //                lastDiffBA = BA;
-
-        //            }
-        //            else if (BA < minDiffValue)
-        //            {
-        //                noLongerProfitableBA();
-        //            }
-        //        }
-        //        else
-        //        {
-        //            noLongerProfitableAB();
-        //            noLongerProfitableBA();
-        //        }
-        //    }
-        //}
-
-        //private void noLongerProfitableAB()
-        //{
-        //    if (wasProfitableAB == true)
-        //    {
-        //        string message = $"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)} ";
-        //        message += $"{objA.SymbolName} diff {objA.ExchangeName} –> {objB.ExchangeName} no longer profitable";
-        //        message += "\n-----------------------------\n";
-        //        File.AppendAllText("Profit.log", message);
-        //    }
-        //    wasProfitableAB = false;
-        //    lastDiffAB = 0m;
-        //}
-
-        //private void noLongerProfitableBA()
-        //{
-        //    if (wasProfitableBA == true)
-        //    {
-        //        string message = $"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)} ";
-        //        message += $"{objA.SymbolName} diff {objB.ExchangeName} –> {objA.ExchangeName} no longer profitable";
-        //        message += "\n-----------------------------\n";
-        //        File.AppendAllText("Profit.log", message);
-        //    }
-        //    wasProfitableBA = false;
-        //    lastDiffBA = 0m;
-        //}
-
 
         public void WriteDiffState()
         {
             if (objA.Ask != 0 && objA.Bid != 0 && objB.Ask != 0 && objB.Bid != 0)
             {
-                string message = $"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)}   ";
+                string message = $"{DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.fff")}   ";
                 if (objA.Ask < objB.Bid)
                 {
-                    noLongerProfitableBA_();
+                    noLongerProfitableBA();
                     decimal AB = ((objB.Bid - objA.Ask) / objA.Ask) * 100;
                     if (AB >= minDiffValue && (Math.Abs(AB - lastDiffAB) >= minStepValue))
                     {
@@ -123,12 +51,12 @@ namespace CryptoMonitorCore
                     }
                     else if (AB < minDiffValue)
                     {
-                        noLongerProfitableAB_();
+                        noLongerProfitableAB();
                     }
                 }
                 else if (objB.Ask < objA.Bid)
                 {
-                    noLongerProfitableAB_();
+                    noLongerProfitableAB();
                     decimal BA = ((objA.Bid - objB.Ask) / objB.Ask) * 100;
                     if (BA >= minDiffValue && (Math.Abs(BA - lastDiffBA) >= minStepValue))
                     {
@@ -141,37 +69,41 @@ namespace CryptoMonitorCore
                     }
                     else if (BA < minDiffValue)
                     {
-                        noLongerProfitableBA_();
+                        noLongerProfitableBA();
                     }
                 }
                 else
                 {
-                    noLongerProfitableAB_();
-                    noLongerProfitableBA_();
+                    noLongerProfitableAB();
+                    noLongerProfitableBA();
                 }
             }
         }
 
-        private void noLongerProfitableAB_()
+        private void noLongerProfitableAB()
         {
             if (wasProfitableAB == true)
             {
-                string message = $"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)}   ";
+                DateTime currentDateTime = DateTime.Now;
+                TimeSpan timeDiff = currentDateTime - lastABtime;
+                string message = $"{currentDateTime.ToString("dd.MM.yyyy HH:mm:ss.fff")}   ";
                 message += $"{objA.ExchangeName}_{objB.ExchangeName}   ";
-                message += $"{DateTime.Now.Subtract(lastABtime)}\n";
+                message += $"{timeDiff:hh\\:mm\\:ss\\.fff}\n";
                 File.AppendAllText($"{objA.SymbolName}.log", message);
             }
             wasProfitableAB = false;
             lastDiffAB = 0m;
         }
 
-        private void noLongerProfitableBA_()
+        private void noLongerProfitableBA()
         {
             if (wasProfitableBA == true)
             {
-                string message = $"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)}   ";
+                DateTime currentDateTime = DateTime.Now;
+                TimeSpan timeDiff = currentDateTime - lastBAtime;
+                string message = $"{currentDateTime.ToString("dd.MM.yyyy HH:mm:ss.fff", CultureInfo.InvariantCulture)}   ";
                 message += $"{objA.ExchangeName}_{objB.ExchangeName}   ";
-                message += $"{DateTime.Now.Subtract(lastBAtime)}\n";
+                message += $"{timeDiff:hh\\:mm\\:ss\\.fff}\n";
                 File.AppendAllText($"{objA.SymbolName}.log", message);
             }
             wasProfitableBA = false;
