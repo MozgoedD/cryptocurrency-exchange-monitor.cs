@@ -33,7 +33,7 @@ namespace CryptoMonitorCore
 
         public static List<Symbol> InitSymbols(Settings setting)
         {
-            List<string> exhanges = new List<string>() { "gate.io", "Okex", "Huobi" };
+            List<string> exhanges = new List<string>() { "gate", "okex", "huobi" };
             ISymbolFactory symbolFactory = new SymbolFactory();
             List<Symbol> symbols = new List<Symbol>();
             foreach (var SymSettingList in setting.Symbols)
@@ -101,7 +101,7 @@ namespace CryptoMonitorCore
             ArrayList symParams;
             foreach (Symbol symObj in symbols)
             {
-                if(symObj.ExchangeName == "gate.io")
+                if(symObj.ExchangeName == "gate")
                 {
                     symParams = new ArrayList()
                     {
@@ -127,7 +127,7 @@ namespace CryptoMonitorCore
             List<string> Args = new List<string>();
             foreach (Symbol symObj in symbols)
             {
-                if (symObj.ExchangeName == "Okex")
+                if (symObj.ExchangeName == "okex")
                 {
                     Args.Add($"spot/depth:{symObj.SymbolName}-USDT");
                 }                    
@@ -149,7 +149,7 @@ namespace CryptoMonitorCore
 
             foreach (Symbol symObj in symbols)
             {
-                if (symObj.ExchangeName == "Huobi")
+                if (symObj.ExchangeName == "huobi")
                 {
                     Requests.Huobi reqObj = new Requests.Huobi()
                     {

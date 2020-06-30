@@ -78,7 +78,7 @@ namespace CryptoMonitorCore
                         processingSym = processingSym.Remove(processingSym.Length - 5);
                         foreach (Symbol symObj in symbols)
                         {
-                            if (symObj.ExchangeName == "gate.io" && symObj.SymbolName == processingSym)
+                            if (symObj.ExchangeName == "gate" && symObj.SymbolName == processingSym)
                             {
                                 processingSymObj = symObj;
                                 break;
@@ -181,7 +181,7 @@ namespace CryptoMonitorCore
 
                         foreach (Symbol symObj in symbols)
                         {
-                            if (symObj.ExchangeName == "Okex" && symObj.SymbolName == processingSym)
+                            if (symObj.ExchangeName == "okex" && symObj.SymbolName == processingSym)
                             {
                                 processingSymObj = symObj;
                                 break;
@@ -294,7 +294,7 @@ namespace CryptoMonitorCore
 
                         foreach (Symbol symObj in symbols)
                         {
-                            if (symObj.ExchangeName == "Huobi" && symObj.SymbolName == processingSym)
+                            if (symObj.ExchangeName == "huobi" && symObj.SymbolName == processingSym)
                             {
                                 processingSymObj = symObj;
                                 break;

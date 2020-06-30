@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 namespace CryptoMonitorCore
@@ -46,7 +47,7 @@ namespace CryptoMonitorCore
             {
                 if (symObj.Ask != symObj.lastAsk && symObj.Bid != symObj.lastBid)
                 {
-                    string message = $"{DateTime.Now} {symObj.ExchangeName} {SymbolName}:";
+                    string message = $"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)} {symObj.ExchangeName} {SymbolName}:";
                     message += $"\nAsk: {symObj.Ask}; Bid: {symObj.Bid}";
                     message += "\n---------------------------\n";
                     File.AppendAllText("Market.log", message);
@@ -57,7 +58,8 @@ namespace CryptoMonitorCore
                 {
                     if (diffStateObj.ObjA == symObj || diffStateObj.ObjB == symObj)
                     {
-                        diffStateObj.WriteMarketDiffState();
+                        //diffStateObj.WriteMarketDiffState();
+                        diffStateObj.WriteDiffState();
                     }
                 }
             }
