@@ -10,16 +10,16 @@ namespace CryptoMonitorCore
     {
         interface ISymbolFactory
         {
-            Symbol CreateSymbol(string exchangeName, string symbol);
+            Symbol CreateSymbol(string exchangeName, string coinA, string coinB);
             SymbolMarket CreateSymbolMarket(string symbolName, decimal minDiffValue, decimal minStepValue, decimal minVolume, List<Symbol> symbols);
             DiffState CreateDiffState(Symbol objA, Symbol objB, decimal minDiffValue, decimal minStepValue);
         }
 
         public class SymbolFactory : ISymbolFactory
         {
-            public Symbol CreateSymbol(string exchangeName, string symbol)
+            public Symbol CreateSymbol(string exchangeName, string coinA, string coinB)
             {
-                return new Symbol(exchangeName, symbol);
+                return new Symbol(exchangeName, coinA, coinB);
             }
             public SymbolMarket CreateSymbolMarket(string symbolName, decimal minDiffValue, decimal minStepValue, decimal minVolume, List<Symbol> symbols)
             {
@@ -40,7 +40,7 @@ namespace CryptoMonitorCore
             {
                 foreach (string exchange in exhanges)
                 {
-                    Symbol symbolObj = symbolFactory.CreateSymbol(exchange, SymSettingList[0]);
+                    Symbol symbolObj = symbolFactory.CreateSymbol(exchange, SymSettingList[0], SymSettingList[1]);
                     symbols.Add(symbolObj);
                     Console.WriteLine($"Symbol: {symbolObj.ExchangeName} {symbolObj.SymbolName} has been initialized");
                 }
@@ -54,10 +54,10 @@ namespace CryptoMonitorCore
             List<SymbolMarket> symbolMarkets = new List<SymbolMarket>();
             foreach (var SymSettingList in setting.Symbols)
             {
-                decimal minDiffValue = Convert.ToDecimal(SymSettingList[1], CultureInfo.InvariantCulture);
-                decimal minStepValue = Convert.ToDecimal(SymSettingList[2], CultureInfo.InvariantCulture);
-                decimal minVolume = Convert.ToDecimal(SymSettingList[3], CultureInfo.InvariantCulture);
-                SymbolMarket symMarketObj = symbolFactory.CreateSymbolMarket(SymSettingList[0], minDiffValue, minStepValue, minVolume, symbols);
+                decimal minDiffValue = Convert.ToDecimal(SymSettingList[2], CultureInfo.InvariantCulture);
+                decimal minStepValue = Convert.ToDecimal(SymSettingList[3], CultureInfo.InvariantCulture);
+                decimal minVolume = Convert.ToDecimal(SymSettingList[4], CultureInfo.InvariantCulture);
+                SymbolMarket symMarketObj = symbolFactory.CreateSymbolMarket($"{SymSettingList[0]}-{SymSettingList[1]}", minDiffValue, minStepValue, minVolume, symbols);
                 symbolMarkets.Add(symMarketObj);
                 //symMarketObj.SymMarketStatus();
             }
@@ -105,7 +105,7 @@ namespace CryptoMonitorCore
                 {
                     symParams = new ArrayList()
                     {
-                        $"{symObj.SymbolName}_USDT",
+                        $"{symObj.CoinA}_{symObj.CoinB}",
                         5,
                         "0.00000001"
                     };
@@ -129,7 +129,7 @@ namespace CryptoMonitorCore
             {
                 if (symObj.ExchangeName == "okex")
                 {
-                    Args.Add($"spot/depth:{symObj.SymbolName}-USDT");
+                    Args.Add($"spot/depth:{symObj.CoinA}-{symObj.CoinB}");
                 }                    
             }
             Requests.Okex reqObj = new Requests.Okex()
@@ -153,7 +153,7 @@ namespace CryptoMonitorCore
                 {
                     Requests.Huobi reqObj = new Requests.Huobi()
                     {
-                        Sub = $"market.{symObj.SymbolName.ToLower()}usdt.mbp.refresh.10",
+                        Sub = $"market.{symObj.CoinA.ToLower()}{symObj.CoinB.ToLower()}.mbp.refresh.10",
                         Id = id
                     };
                     id++;

@@ -10,6 +10,8 @@ namespace CryptoMonitorCore
         private decimal bestBid;
         public decimal lastAsk { get; set; }
         public decimal lastBid { get; set; }
+        private string coinA;
+        private string coinB;
         private SortedDictionary<decimal, decimal> asks = new SortedDictionary<decimal, decimal>();
         private SortedDictionary<decimal, decimal> bids = new SortedDictionary<decimal, decimal>();
 
@@ -17,14 +19,31 @@ namespace CryptoMonitorCore
         {
         }
 
-        public Symbol(string exchangeName, string symbol)
+        public Symbol(string exchangeName, string coinA, string coinB)
         {
             ExchangeName = exchangeName;
-            SymbolName = symbol;
+            this.coinA = coinA;
+            this.coinB = coinB;
         }
 
         public string ExchangeName { get; }
-        public string SymbolName { get; }
+        public string SymbolName
+        {
+            get
+            {
+                return $"{coinA}-{coinB}";
+            }
+        }
+
+        public string CoinA
+        {
+            get { return coinA; }
+        }
+
+        public string CoinB
+        {
+            get { return coinB; }
+        }
 
         public decimal Ask
         {

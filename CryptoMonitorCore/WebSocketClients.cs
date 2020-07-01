@@ -62,7 +62,7 @@ namespace CryptoMonitorCore
                     asks.Clear();
                     bids.Clear();
                     string jsonString = msg.ToString();
-                    //LogWriters.WriteResponce("gate.io", jsonString);
+                    LogWriters.WriteResponce("gate.io", jsonString);
 
                     JObject jsonObj = JObject.Parse(jsonString);
                     if (jsonObj.ContainsKey("result"))
@@ -75,7 +75,7 @@ namespace CryptoMonitorCore
                     else if (jsonObj.ContainsKey("params"))
                     {                      
                         string processingSym = jsonObj["params"][2].ToString();
-                        processingSym = processingSym.Remove(processingSym.Length - 5);
+                        processingSym = processingSym.Replace("_", "-");
                         foreach (Symbol symObj in symbols)
                         {
                             if (symObj.ExchangeName == "gate" && symObj.SymbolName == processingSym)
@@ -160,7 +160,7 @@ namespace CryptoMonitorCore
                     bids.Clear();
                     byte[] bytes = msg.Binary;
                     string jsonString = DecompressOkex(bytes);
-                    //LogWriters.WriteResponce("Okex", jsonString);
+                    LogWriters.WriteResponce("Okex", jsonString);
 
                     JObject jsonObj = JObject.Parse(jsonString);
 
@@ -170,14 +170,12 @@ namespace CryptoMonitorCore
                         {
                             string okSym = jsonObj["channel"].ToString();
                             okSym = okSym.Substring(11);
-                            okSym = okSym.Remove(okSym.Length - 5);
                             Console.WriteLine($"Okex: {okSym} OK");
                         }
                     }
                     else if (jsonObj.ContainsKey("data"))
                     {
                         string processingSym = jsonObj["data"][0]["instrument_id"].ToString();
-                        processingSym = processingSym.Remove(processingSym.Length - 5);
 
                         foreach (Symbol symObj in symbols)
                         {
@@ -259,7 +257,7 @@ namespace CryptoMonitorCore
                     bids.Clear();
                     byte[] bytes = msg.Binary;
                     string jsonString = Encoding.UTF8.GetString(DecompressHuobi(bytes));
-                    //LogWriters.WriteResponce("Huobi", jsonString);
+                    LogWriters.WriteResponce("Huobi", jsonString);
 
                     JObject jsonObj = JObject.Parse(jsonString);
 
@@ -269,7 +267,7 @@ namespace CryptoMonitorCore
                         {
                             string okSym = jsonObj["subbed"].ToString();
                             okSym = okSym.Substring(7);
-                            okSym = okSym.Remove(okSym.Length - 19).ToUpper();
+                            okSym = okSym.Remove(okSym.Length - 15).ToUpper();
                             Console.WriteLine($"Huobi: {okSym} OK");
                         } 
                     }
@@ -290,11 +288,11 @@ namespace CryptoMonitorCore
                         string processingSym = jsonObj["ch"].ToString();
 
                         processingSym = processingSym.Substring(7);
-                        processingSym = processingSym.Remove(processingSym.Length - 19).ToUpper();
+                        processingSym = processingSym.Remove(processingSym.Length - 15).ToUpper();
 
                         foreach (Symbol symObj in symbols)
                         {
-                            if (symObj.ExchangeName == "huobi" && symObj.SymbolName == processingSym)
+                            if (symObj.ExchangeName == "huobi" && symObj.SymbolName.Replace("-", "") == processingSym)
                             {
                                 processingSymObj = symObj;
                                 break;
@@ -303,7 +301,7 @@ namespace CryptoMonitorCore
 
                         foreach (SymbolMarket symMarketObj in symbolMarkets)
                         {
-                            if (symMarketObj.SymbolName == processingSym)
+                            if (symMarketObj.SymbolName.Replace("-", "") == processingSym)
                             {
                                 processingSymMarketObj = symMarketObj;
                                 break;
