@@ -62,7 +62,7 @@ namespace CryptoMonitorCore
                     asks.Clear();
                     bids.Clear();
                     string jsonString = msg.ToString();
-                    LogWriters.WriteResponce("gate.io", jsonString);
+                    //LogWriters.WriteResponce("gate.io", jsonString);
 
                     JObject jsonObj = JObject.Parse(jsonString);
                     if (jsonObj.ContainsKey("result"))
@@ -160,7 +160,7 @@ namespace CryptoMonitorCore
                     bids.Clear();
                     byte[] bytes = msg.Binary;
                     string jsonString = DecompressOkex(bytes);
-                    LogWriters.WriteResponce("Okex", jsonString);
+                    //LogWriters.WriteResponce("Okex", jsonString);
 
                     JObject jsonObj = JObject.Parse(jsonString);
 
@@ -257,7 +257,7 @@ namespace CryptoMonitorCore
                     bids.Clear();
                     byte[] bytes = msg.Binary;
                     string jsonString = Encoding.UTF8.GetString(DecompressHuobi(bytes));
-                    LogWriters.WriteResponce("Huobi", jsonString);
+                    //LogWriters.WriteResponce("Huobi", jsonString);
 
                     JObject jsonObj = JObject.Parse(jsonString);
 
