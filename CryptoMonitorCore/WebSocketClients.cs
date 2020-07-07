@@ -315,8 +315,17 @@ namespace CryptoMonitorCore
 
                         foreach (var valVol in asks)
                         {
-                            decimal value = Convert.ToDecimal(valVol[0], CultureInfo.InvariantCulture);
+                            decimal value;
                             decimal volume;
+                            try
+                            {
+                                value = Convert.ToDecimal(valVol[0], CultureInfo.InvariantCulture);
+                            }
+                            catch
+                            {
+                                value = decimal.Parse(valVol[0], NumberStyles.Float, CultureInfo.InvariantCulture);
+                            }
+
                             try
                             {
                                 volume = Convert.ToDecimal(valVol[1], CultureInfo.InvariantCulture);
@@ -331,8 +340,17 @@ namespace CryptoMonitorCore
                         }
                         foreach (var valVol in bids)
                         {
-                            decimal value = Convert.ToDecimal(valVol[0], CultureInfo.InvariantCulture);
+                            decimal value;
                             decimal volume;
+                            try
+                            {
+                                value = Convert.ToDecimal(valVol[0], CultureInfo.InvariantCulture);
+                            }
+                            catch
+                            {
+                                value = decimal.Parse(valVol[0], NumberStyles.Float, CultureInfo.InvariantCulture);
+                            }
+
                             try
                             {
                                 volume = Convert.ToDecimal(valVol[1], CultureInfo.InvariantCulture);
