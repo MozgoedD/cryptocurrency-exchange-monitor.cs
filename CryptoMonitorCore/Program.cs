@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -15,14 +16,23 @@ namespace CryptoMonitorCore
         public string okex { get; set; }
         public string huobi { get; set; }
     }
+    public class General
+    {
+        public string minDiff { get; set; }
+        public string minStep { get; set; }
+        public string lotMinUsd { get; set; }
+    }
     public class Settings
     {
         public List<List<string>> Symbols { get; set; }
         public SettingsUrls Urls { get; set; }
-    }
+        public General General { get; set; }
+    }    
 
     class Program
     {
+        private static readonly HttpClient client = new HttpClient();
+
         static void Main(string[] args)
         {
             var exitEvent = new ManualResetEvent(false);
@@ -32,9 +42,13 @@ namespace CryptoMonitorCore
             .Build();
             var setting = new Settings();
             configuration.Bind(setting);
+
+            Currencies.checkSymbolsForAvailabilityInExchanges(setting);
+            Currencies.formedPairs();
+
             List<Symbol> symbols = Utils.InitSymbols(setting);
 
-            List<SymbolMarket> symbolMarkets = Utils.InitSymbolMarkets(setting, symbols);
+            List<SymbolMarket> symbolMarkets = Utils.InitSymbolMarkets(setting, symbols, client);            
 
             string gateioJson = Utils.gateioStringGenerator(symbols);
             string okexJson = Utils.okexStringGenerator(symbols);

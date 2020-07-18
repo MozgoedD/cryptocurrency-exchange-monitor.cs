@@ -30,10 +30,10 @@ namespace CryptoMonitorCore
             }
             diffStates = Utils.InitDiffStates(specificSymbols, minDiffValue, minStepValue);
 
-            foreach (DiffState diffStateObj in diffStates)
-            {
-                diffStateObj.DiffStateStatus();
-            }
+            //foreach (DiffState diffStateObj in diffStates)
+            //{
+            //    diffStateObj.DiffStateStatus();
+            //}
         }
         public string SymbolName { get; }
         public decimal MinVolume

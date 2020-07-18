@@ -2,35 +2,37 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Net.Http;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CryptoMonitorCore
 {
-    public class Utils
+    interface ISymbolFactory
     {
-        interface ISymbolFactory
-        {
-            Symbol CreateSymbol(string exchangeName, string coinA, string coinB);
-            SymbolMarket CreateSymbolMarket(string symbolName, decimal minDiffValue, decimal minStepValue, decimal minVolume, List<Symbol> symbols);
-            DiffState CreateDiffState(Symbol objA, Symbol objB, decimal minDiffValue, decimal minStepValue);
-        }
+        Symbol CreateSymbol(string exchangeName, string coinA, string coinB);
+        SymbolMarket CreateSymbolMarket(string symbolName, decimal minDiffValue, decimal minStepValue, decimal minVolume, List<Symbol> symbols);
+        DiffState CreateDiffState(Symbol objA, Symbol objB, decimal minDiffValue, decimal minStepValue);
+    }
 
-        public class SymbolFactory : ISymbolFactory
+    public class SymbolFactory : ISymbolFactory
+    {
+        public Symbol CreateSymbol(string exchangeName, string coinA, string coinB)
         {
-            public Symbol CreateSymbol(string exchangeName, string coinA, string coinB)
-            {
-                return new Symbol(exchangeName, coinA, coinB);
-            }
-            public SymbolMarket CreateSymbolMarket(string symbolName, decimal minDiffValue, decimal minStepValue, decimal minVolume, List<Symbol> symbols)
-            {
-                return new SymbolMarket(symbolName, minDiffValue, minStepValue, minVolume, symbols);
-            }
-            public DiffState CreateDiffState(Symbol objA, Symbol objB, decimal minDiffValue, decimal minStepValue)
-            {
-                return new DiffState(objA, objB, minDiffValue, minStepValue);
-            }
+            return new Symbol(exchangeName, coinA, coinB);
         }
+        public SymbolMarket CreateSymbolMarket(string symbolName, decimal minDiffValue, decimal minStepValue, decimal minVolume, List<Symbol> symbols)
+        {
+            return new SymbolMarket(symbolName, minDiffValue, minStepValue, minVolume, symbols);
+        }
+        public DiffState CreateDiffState(Symbol objA, Symbol objB, decimal minDiffValue, decimal minStepValue)
+        {
+            return new DiffState(objA, objB, minDiffValue, minStepValue);
+        }
+    }
 
+    public static class Utils
+    {
         public static List<Symbol> InitSymbols(Settings setting)
         {
             List<string> exhanges = new List<string>() { "gate", "okex", "huobi" };
@@ -38,28 +40,46 @@ namespace CryptoMonitorCore
             List<Symbol> symbols = new List<Symbol>();
             foreach (var SymSettingList in setting.Symbols)
             {
-                foreach (string exchange in exhanges)
+                if (Currencies.gateReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}") || Currencies.okexReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}") || Currencies.huobiReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}"))
                 {
-                    Symbol symbolObj = symbolFactory.CreateSymbol(exchange, SymSettingList[0], SymSettingList[1]);
-                    symbols.Add(symbolObj);
-                    Console.WriteLine($"Symbol: {symbolObj.ExchangeName} {symbolObj.SymbolName} has been initialized");
+                    foreach (string exchange in exhanges)
+                    {
+                        Symbol symbolObj = symbolFactory.CreateSymbol(exchange, SymSettingList[0], SymSettingList[1]);
+                        symbols.Add(symbolObj);
+                        //Console.WriteLine($"Symbol: {symbolObj.ExchangeName} {symbolObj.SymbolName} has been initialized");
+                    }
                 }
+                else { continue;  }
             }
             return symbols;
         }
 
-        public static List<SymbolMarket> InitSymbolMarkets(Settings setting, List<Symbol> symbols)
+        public static List<SymbolMarket> InitSymbolMarkets(Settings setting, List<Symbol> symbols, HttpClient client)
         {
             ISymbolFactory symbolFactory = new SymbolFactory();
             List<SymbolMarket> symbolMarkets = new List<SymbolMarket>();
             foreach (var SymSettingList in setting.Symbols)
             {
-                decimal minDiffValue = Convert.ToDecimal(SymSettingList[2], CultureInfo.InvariantCulture);
-                decimal minStepValue = Convert.ToDecimal(SymSettingList[3], CultureInfo.InvariantCulture);
-                decimal minVolume = Convert.ToDecimal(SymSettingList[4], CultureInfo.InvariantCulture);
-                SymbolMarket symMarketObj = symbolFactory.CreateSymbolMarket($"{SymSettingList[0]}-{SymSettingList[1]}", minDiffValue, minStepValue, minVolume, symbols);
-                symbolMarkets.Add(symMarketObj);
-                //symMarketObj.SymMarketStatus();
+                //var responseString = client.GetStringAsync($"https://data.gateio.la/api2/1/ticker/{SymSettingList[0].ToLower()}_usdt");
+                //JObject jsonObj = JObject.Parse(responseString.Result);
+                //decimal coinUSDT = Convert.ToDecimal(jsonObj["last"], CultureInfo.InvariantCulture);
+                //decimal minVolume = lotMinUsd / coinUSDT;
+                
+                if (Currencies.gateReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}")|| Currencies.okexReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}")|| Currencies.huobiReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}"))
+                {
+                    decimal minDiffValue = Convert.ToDecimal(setting.General.minDiff, CultureInfo.InvariantCulture);
+                    decimal minStepValue = Convert.ToDecimal(setting.General.minStep, CultureInfo.InvariantCulture);
+                    decimal lotMinUsd = Convert.ToDecimal(setting.General.lotMinUsd, CultureInfo.InvariantCulture);
+                    decimal minVolume = Currencies.getMinVolume(SymSettingList[0], lotMinUsd, client);
+
+                    SymbolMarket symMarketObj = symbolFactory.CreateSymbolMarket($"{SymSettingList[0]}-{SymSettingList[1]}", minDiffValue, minStepValue, minVolume, symbols);
+                    symbolMarkets.Add(symMarketObj);
+                    symMarketObj.SymMarketStatus();
+                }
+                else
+                {
+                    Console.WriteLine($"{SymSettingList[0]}-{SymSettingList[1]} does not support by any exchange!!!");
+                }
             }
             return symbolMarkets;
         }

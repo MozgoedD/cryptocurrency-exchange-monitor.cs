@@ -45,6 +45,8 @@ namespace CryptoMonitorCore
 
         public static WebsocketClient StartGateIO(string url, List<Symbol> symbols, List<SymbolMarket> symbolMarkets)
         {
+            string lastMessage = "";
+            List<string> okSyms = new List<string>() { };
             Uri gateio_url = new Uri(url);
             var gateioClient = new WebsocketClient(gateio_url);
             Symbol processingSymObj = new Symbol();
@@ -53,7 +55,10 @@ namespace CryptoMonitorCore
             List<List<string>> bids = new List<List<string>>();
             gateioClient.ReconnectTimeout = TimeSpan.FromSeconds(30);
             gateioClient.ReconnectionHappened.Subscribe(info =>
-                Console.WriteLine($"Gate.io Reconnection happened, type: {info.Type}"));
+            {
+                Console.WriteLine($"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)}   Gate Reconnection happened, type: {info.Type}");
+                Console.WriteLine($"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)}   {lastMessage}");
+            });
             gateioClient
                 .MessageReceived
                 .ObserveOn(TaskPoolScheduler.Default)
@@ -62,6 +67,7 @@ namespace CryptoMonitorCore
                     asks.Clear();
                     bids.Clear();
                     string jsonString = msg.ToString();
+                    lastMessage = jsonString;
                     //LogWriters.WriteResponce("gate.io", jsonString);
 
                     JObject jsonObj = JObject.Parse(jsonString);
@@ -69,13 +75,18 @@ namespace CryptoMonitorCore
                     {
                         if (jsonObj["result"]["status"].ToString() == "success")
                         {
-                            Console.WriteLine("gate.io: OK");
+                            Console.WriteLine($"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)}   gate.io server responds");
                         }
                     }
                     else if (jsonObj.ContainsKey("params"))
                     {                      
                         string processingSym = jsonObj["params"][2].ToString();
                         processingSym = processingSym.Replace("_", "-");
+                        if (!okSyms.Contains(processingSym))
+                        {
+                            okSyms.Add(processingSym);
+                            Console.WriteLine($"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)}   Gate {processingSym}: OK");
+                        }
                         foreach (Symbol symObj in symbols)
                         {
                             if (symObj.ExchangeName == "gate" && symObj.SymbolName == processingSym)
@@ -142,6 +153,7 @@ namespace CryptoMonitorCore
 
         public static WebsocketClient StartOkex(string url, List<Symbol> symbols, List<SymbolMarket> symbolMarkets)
         {
+            string lastMessage = "";
             Uri okex_url = new Uri(url);
             var okexClient = new WebsocketClient(okex_url);
             Symbol processingSymObj = new Symbol();
@@ -150,7 +162,10 @@ namespace CryptoMonitorCore
             List<List<string>> bids = new List<List<string>>();
             okexClient.ReconnectTimeout = TimeSpan.FromSeconds(30);
             okexClient.ReconnectionHappened.Subscribe(info =>
-                Console.WriteLine($"Okex Reconnection happened, type: {info.Type}"));
+            {
+                Console.WriteLine($"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)}   Okex Reconnection happened, type: {info.Type}");
+                Console.WriteLine($"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)}   {lastMessage}");
+            });
             okexClient
                 .MessageReceived
                 .ObserveOn(TaskPoolScheduler.Default)
@@ -160,6 +175,7 @@ namespace CryptoMonitorCore
                     bids.Clear();
                     byte[] bytes = msg.Binary;
                     string jsonString = DecompressOkex(bytes);
+                    lastMessage = jsonString;
                     //LogWriters.WriteResponce("Okex", jsonString);
 
                     JObject jsonObj = JObject.Parse(jsonString);
@@ -170,7 +186,7 @@ namespace CryptoMonitorCore
                         {
                             string okSym = jsonObj["channel"].ToString();
                             okSym = okSym.Substring(11);
-                            Console.WriteLine($"Okex: {okSym} OK");
+                            Console.WriteLine($"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)}   Okex: {okSym} OK");
                         }
                     }
                     else if (jsonObj.ContainsKey("data"))
@@ -239,6 +255,7 @@ namespace CryptoMonitorCore
 
         public static WebsocketClient StartHuobi(string url, List<Symbol> symbols, List<SymbolMarket> symbolMarkets)
         {
+            string lastMessage = "";
             Uri okex_url = new Uri(url);
             var huobiClient = new WebsocketClient(okex_url);
             Symbol processingSymObj = new Symbol();
@@ -247,8 +264,11 @@ namespace CryptoMonitorCore
             List<List<string>> bids = new List<List<string>>();
             huobiClient.ReconnectTimeout = TimeSpan.FromSeconds(30);
             huobiClient.ReconnectionHappened.Subscribe(info =>
-                Console.WriteLine($"Huobi Reconnection happened, type: {info.Type}"));
-            huobiClient
+            {
+                Console.WriteLine($"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)}   Huobi Reconnection happened, type: {info.Type}");
+                Console.WriteLine($"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)}   {lastMessage}");
+            });
+        huobiClient
                 .MessageReceived
                 .ObserveOn(TaskPoolScheduler.Default)
                 .Subscribe(msg =>
@@ -257,6 +277,7 @@ namespace CryptoMonitorCore
                     bids.Clear();
                     byte[] bytes = msg.Binary;
                     string jsonString = Encoding.UTF8.GetString(DecompressHuobi(bytes));
+                    lastMessage = jsonString;
                     //LogWriters.WriteResponce("Huobi", jsonString);
 
                     JObject jsonObj = JObject.Parse(jsonString);
@@ -268,7 +289,7 @@ namespace CryptoMonitorCore
                             string okSym = jsonObj["subbed"].ToString();
                             okSym = okSym.Substring(7);
                             okSym = okSym.Remove(okSym.Length - 15).ToUpper();
-                            Console.WriteLine($"Huobi: {okSym} OK");
+                            Console.WriteLine($"{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff", CultureInfo.InvariantCulture)}   Huobi: {okSym} OK");
                         } 
                     }
 
