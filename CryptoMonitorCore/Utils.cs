@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -40,7 +41,7 @@ namespace CryptoMonitorCore
             List<Symbol> symbols = new List<Symbol>();
             foreach (var SymSettingList in setting.Symbols)
             {
-                if (Currencies.gateReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}") || Currencies.okexReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}") || Currencies.huobiReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}"))
+                if (Currencies.gate_okex_Intersect.Contains($"{SymSettingList[0]}-{SymSettingList[1]}") || Currencies.okex_huobiIntersect.Contains($"{SymSettingList[0]}-{SymSettingList[1]}") || Currencies.gate_huobiIntersect.Contains($"{SymSettingList[0]}-{SymSettingList[1]}"))
                 {
                     foreach (string exchange in exhanges)
                     {
@@ -49,7 +50,16 @@ namespace CryptoMonitorCore
                         //Console.WriteLine($"Symbol: {symbolObj.ExchangeName} {symbolObj.SymbolName} has been initialized");
                     }
                 }
-                else { continue;  }
+                else if (Currencies.gateReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}") || Currencies.okexReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}") || Currencies.huobiReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}"))
+                {
+                    Console.WriteLine($"{SymSettingList[0]}-{SymSettingList[1]} available only for 1 exchange. This symbol will not not be included in the program");
+                    continue;
+                }
+                else
+                {
+                    Console.WriteLine($"{SymSettingList[0]}-{SymSettingList[1]} does not support by any exchange!!!");
+                    continue;
+                }
             }
             return symbols;
         }
@@ -64,8 +74,8 @@ namespace CryptoMonitorCore
                 //JObject jsonObj = JObject.Parse(responseString.Result);
                 //decimal coinUSDT = Convert.ToDecimal(jsonObj["last"], CultureInfo.InvariantCulture);
                 //decimal minVolume = lotMinUsd / coinUSDT;
-                
-                if (Currencies.gateReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}")|| Currencies.okexReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}")|| Currencies.huobiReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}"))
+
+                if (Currencies.gate_okex_Intersect.Contains($"{SymSettingList[0]}-{SymSettingList[1]}") || Currencies.okex_huobiIntersect.Contains($"{SymSettingList[0]}-{SymSettingList[1]}") || Currencies.gate_huobiIntersect.Contains($"{SymSettingList[0]}-{SymSettingList[1]}"))
                 {
                     decimal minDiffValue = Convert.ToDecimal(setting.General.minDiff, CultureInfo.InvariantCulture);
                     decimal minStepValue = Convert.ToDecimal(setting.General.minStep, CultureInfo.InvariantCulture);
@@ -78,7 +88,8 @@ namespace CryptoMonitorCore
                 }
                 else
                 {
-                    Console.WriteLine($"{SymSettingList[0]}-{SymSettingList[1]} does not support by any exchange!!!");
+                    //Console.WriteLine($"{SymSettingList[0]}-{SymSettingList[1]} does not support by any exchange!!!");
+                    continue;
                 }
             }
             return symbolMarkets;
@@ -129,7 +140,7 @@ namespace CryptoMonitorCore
                         5,
                         "0.00000001"
                     };
-                    Params.Add(symParams);
+                    Params.Add(symParams);                    
                 }
             }
             Requests.GateIO reqObj = new Requests.GateIO()
@@ -149,7 +160,7 @@ namespace CryptoMonitorCore
             {
                 if (symObj.ExchangeName == "okex")
                 {
-                    Args.Add($"spot/depth:{symObj.CoinA}-{symObj.CoinB}");
+                    Args.Add($"spot/depth:{symObj.CoinA}-{symObj.CoinB}");                                       
                 }                    
             }
             Requests.Okex reqObj = new Requests.Okex()
@@ -178,7 +189,7 @@ namespace CryptoMonitorCore
                     };
                     id++;
                     json = JsonConvert.SerializeObject(reqObj, Formatting.Indented);
-                    jsonStrings.Add(json);
+                    jsonStrings.Add(json);                    
                 }
             }
             return jsonStrings;

@@ -18,10 +18,19 @@ namespace CryptoMonitorCore
         public static List<string> okexReadyToGo = new List<string>();
         public static List<string> huobiReadyToGo = new List<string>();
 
+        public static IEnumerable<string> gate_okex_Intersect;
+        public static IEnumerable<string> okex_huobiIntersect;
+        public static IEnumerable<string> gate_huobiIntersect;
+        public static IEnumerable<string> gate_okex_huobiIntersect;
+
+        public static List<string> symbolsInSettings = new List<string>();
+
         public static void checkSymbolsForAvailabilityInExchanges(Settings setting)
         {
             foreach (var SymSettingList in setting.Symbols)
             {
+                symbolsInSettings.Add($"{SymSettingList[0]}-{SymSettingList[1]}");
+
                 if (gateSymbols.Contains($"{SymSettingList[0]}-{SymSettingList[1]}"))
                 {
                     gateReadyToGo.Add($"{SymSettingList[0]}-{SymSettingList[1]}");
@@ -35,7 +44,6 @@ namespace CryptoMonitorCore
                     huobiReadyToGo.Add($"{SymSettingList[0]}-{SymSettingList[1]}");
                 }
             }
-            var gate_okex_Intersect = gateReadyToGo.Intersect(okexReadyToGo);
             //foreach (var SymSettingList in setting.Symbols)
             //{
             //    if (!gateReadyToGo.Contains($"{SymSettingList[0]}-{SymSettingList[1]}"))
@@ -55,18 +63,56 @@ namespace CryptoMonitorCore
 
         public static void formedPairs()
         {
-            var gate_okex_Intersect = gateReadyToGo.Intersect(okexReadyToGo);
-            var okex_huobiIntersect = gateReadyToGo.Intersect(okexReadyToGo);
+            gate_okex_Intersect = gateReadyToGo.Intersect(okexReadyToGo);
+            okex_huobiIntersect = okexReadyToGo.Intersect(huobiReadyToGo);
+            gate_huobiIntersect = gateReadyToGo.Intersect(huobiReadyToGo);
+            gate_okex_huobiIntersect = gate_okex_Intersect.Intersect(huobiReadyToGo);
 
-            foreach (var symbol in gate_okex_Intersect)
+            foreach (var symbol in symbolsInSettings)
             {
-                Console.WriteLine($"{symbol} available for gate.io – okex");
+                if (gate_okex_huobiIntersect.Contains(symbol))
+                {
+                    Console.WriteLine($"{symbol} available for gate.io – okex, okex – huobi, gate.io – huobi");
+                }
+                else if (gate_okex_Intersect.Contains(symbol))
+                {
+                    Console.WriteLine($"{symbol} available for gate.io – okex");
+                }
+                else if (okex_huobiIntersect.Contains(symbol))
+                {
+                    Console.WriteLine($"{symbol} available for okex – huobi");
+                }
+                else if (gate_huobiIntersect.Contains(symbol))
+                {
+                    Console.WriteLine($"{symbol} available for gate.io – huobi");
+                }
             }
 
-            foreach (var symbol in okex_huobiIntersect)
-            {
-                Console.WriteLine($"{symbol} available for okex – huobi");
-            }
+            //foreach (var symbol in gateSymbols)
+            //{
+            //    if (huobiSymbols.Contains(symbol))
+            //    {
+            //        if (!okexSymbols.Contains(symbol))
+            //        {
+            //            Console.WriteLine($"{symbol} gate-huobi");
+
+            //        }
+            //    }                     
+            //}
+            //foreach (var symbol in gate_okex_Intersect)
+            //{
+            //    Console.WriteLine($"{symbol} available for gate.io – okex");
+            //}
+
+            //foreach (var symbol in okex_huobiIntersect)
+            //{
+            //    Console.WriteLine($"{symbol} available for okex – huobi");
+            //}
+
+            //foreach (var symbol in gate_huobiIntersect)
+            //{
+            //    Console.WriteLine($"{symbol} available for gate – huobi");
+            //}
         }
 
         public static decimal getMinVolume(string coin, decimal lotMinUsd, HttpClient client)
@@ -97,7 +143,7 @@ namespace CryptoMonitorCore
             }
             else
             {
-                Console.WriteLine($"Coin {coin} was not found in any exchange");
+                Console.WriteLine($"Coin {coin}-USDT pair was not found in any exchange");
                 return 0m;
             }
         }

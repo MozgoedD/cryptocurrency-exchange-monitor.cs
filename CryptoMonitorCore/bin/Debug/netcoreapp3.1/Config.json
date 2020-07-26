@@ -1,61 +1,84 @@
 ﻿{
   // параметры: название монеты 1/
   // название монеты 2 (монета 1 + монета 2 = символE)
-  // минимальный объем аска/бида (в валюте)
 
   "Symbols": [
-    [ "ATOM", "BTC" ],
-    [ "BCH", "BTC" ],
-    [ "EOS", "BTC" ],
-    [ "ETC", "BTC" ],
-    [ "ETH", "BTC" ],
-    [ "LTC", "BTC" ],
-    [ "XTZ", "BTC" ],
-    [ "ONT", "BTC" ],
+    [ "XLM", "USDT" ],
+    [ "XLM", "BTC" ],
+    [ "XLM", "ETH" ],
 
-    [ "BTC", "USDT" ],
-    [ "ONT", "USDT" ],
-    [ "XPO", "USDT" ],
-    [ "TT", "USDT" ],
-    [ "BCH", "USDT"],
-    [ "LTC", "USDT"],
+    [ "NPXS", "BTC" ],
+    [ "NPXS", "ETH" ],
 
-    [ "EOS", "ETH"],
-    [ "ATOM", "ETH"],
-    [ "ONT", "ETH" ],
-    //////////////
 
-    [ "SNX", "USDT" ],
-    [ "SNX", "BTC" ],
-    [ "SNX", "ETH" ],
+    [ "ATP", "USDT" ],
 
-    [ "AKRO", "USDT" ],
-    [ "AKRO", "BTC" ],
-    [ "AKRO", "ETH" ],
+    [ "BTS", "USDT" ],
+    [ "BTS", "BTC" ],
 
-    [ "BAX", "USDT" ],
-    [ "BAX", "BTC" ],
-    [ "BAX", "ETH" ],
+    [ "PAY", "USDT" ],
+    [ "PAY", "ETH" ],
 
-    [ "VRA", "USDT" ],
-    [ "VRA", "BTC" ],
-    [ "VRA", "ETH" ],
+    [ "THETA", "USDT" ],
+    [ "THETA", "ETH" ],
 
-    [ "NWC", "USDT" ],
-    [ "NWC", "BTC" ],
-    [ "NWC", "ETH" ],
+    [ "RUFF", "USDT" ],
+    [ "RUFF", "BTC" ],
+    [ "RUFF", "ETH" ],
 
-    [ "DAG", "USDT" ],
-    [ "DAG", "BTC" ],
-    [ "DAG", "ETH" ],
+    [ "NOT", "EXIST" ]
+    // [ "ATOM", "BTC" ],
+    // [ "BCH", "BTC" ],
+    // [ "EOS", "BTC" ],
+    // [ "ETC", "BTC" ],
+    // [ "ETH", "BTC" ],
+    // [ "LTC", "BTC" ],
+    // [ "XTZ", "BTC" ],
+    // [ "ONT", "BTC" ],
 
-    [ "AMPL", "USDT" ],
-    [ "AMPL", "BTC" ],
-    [ "AMPL", "ETH" ],
+    // [ "BTC", "USDT" ],
+    // [ "ONT", "USDT" ],
+    // [ "XPO", "USDT" ],
+    // [ "TT", "USDT" ],
+    // [ "BCH", "USDT"],
+    // [ "LTC", "USDT"],
 
-    [ "KSM", "USDT" ],
-    [ "KSM", "BTC" ],
-    [ "KSM", "ETH" ]
+    // [ "EOS", "ETH"],
+    // [ "ATOM", "ETH"],
+    // [ "ONT", "ETH" ],
+    // //////////////
+
+    // [ "SNX", "USDT" ],
+    // [ "SNX", "BTC" ],
+    // [ "SNX", "ETH" ],
+
+    // [ "AKRO", "USDT" ],
+    // [ "AKRO", "BTC" ],
+    // [ "AKRO", "ETH" ],
+
+    // [ "BAX", "USDT" ],
+    // [ "BAX", "BTC" ],
+    // [ "BAX", "ETH" ],
+
+    // [ "VRA", "USDT" ],
+    // [ "VRA", "BTC" ],
+    // [ "VRA", "ETH" ],
+
+    // [ "NWC", "USDT" ],
+    // [ "NWC", "BTC" ],
+    // [ "NWC", "ETH" ],
+
+    // [ "DAG", "USDT" ],
+    // [ "DAG", "BTC" ],
+    // [ "DAG", "ETH" ],
+
+    // [ "AMPL", "USDT" ],
+    // [ "AMPL", "BTC" ],
+    // [ "AMPL", "ETH" ],
+
+    // [ "KSM", "USDT" ],
+    // [ "KSM", "BTC" ],
+    // [ "KSM", "ETH" ]
   ],
   "Urls": {
     "gateio": "wss://ws.gate.io/v3/",
